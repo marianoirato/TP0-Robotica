@@ -30,4 +30,7 @@
 #define LED_Izquierdo PA9
 #define LED_Derecho PB12
 
+// Botones
+#define BOTON PB14
+
 #endif
