@@ -30,7 +30,9 @@ void setup() {
     pinMode(SL_DERECHO, INPUT);
 
     digitalWrite(MOTOR_ENABLE, HIGH);
+    digitalWrite(ENCODER_ENABLE, HIGH);
     digitalWrite(SL_ENABLE, HIGH);
+
 
     pinMode(LED_Izquierdo, OUTPUT);
     pinMode(LED_Derecho, OUTPUT);
