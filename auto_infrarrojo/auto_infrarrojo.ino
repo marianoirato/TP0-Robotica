@@ -4,12 +4,12 @@ SoftwareSerial mySerial(PB10, PB11);
 
 // Velocidades en PWM
 #define MAXIMA_VELOCIDAD_DIRECTA 0
-#define VELOCIDAD_INTERMEDIA_DIRECTA 1747
+#define VELOCIDAD_INTERMEDIA_DIRECTA 800     // cambio 1747 a 800 
 #define MOTOR_PARADO 2047
 #define MAXIMA_VELOCIDAD_INVERSA 4095
 #define VELOCIDAD_INTERMEDIA_INVERSA 3047
 
-float UMBRAL = 500; // Mayor a este umbral es NEGRO
+float UMBRAL = 500;                   // Mayor a este umbral es NEGRO
 int SL_IZQUIERDO_VALOR_ANTERIOR = 0;
 int SL_DERECHO_VALOR_ANTERIOR = 0;
 
@@ -40,55 +40,87 @@ void setup() {
     mySerial.begin(9600);
 
     pinMode(BOTON, INPUT);
+
+    Serial.begin(9600);                      // iniciailzamos la comunicación
+    pinMode(SONAR_TRIGGER, OUTPUT);          // pin como salida
+    pinMode(SONAR_ECHO, INPUT);              // pin como entrada
+    pinMode(SONAR_ENABLE, OUTPUT);
+    digitalWrite(SONAR_TRIGGER, LOW);        // Inicializamos el pin con 0
+    digitalWrite(SONAR_ENABLE, HIGH);
     
 }
 
 void loop() {
-  if(!digitalRead(BOTON)){
-    calibrar_negro();
-  }
+
+  long tiempo;                         // timepo que demora en llegar el eco
+  long distancia;                      // distancia en centimetros
+
+  digitalWrite(Trigger, HIGH);
+  delayMicroseconds(10);               // Enviamos un pulso de 10us
+  digitalWrite(Trigger, LOW);
   
+  tiempo = pulseIn(Echo, HIGH);        //  obtenemos el ancho del pulso
+  distancia = tiempo/59;               //  escalamos el tiempo a una distancia en cm entre el sensor y el objeto detectado
+                                       //  se divide por 59, ya que el ultrasonido viaja aprox 59us por cm en el aire
+
+/*
+   mySerial.print("DISTANCIA: ");
+   mySerial.print(distancia);
+*/
+
+  if(distancia<=20){                      // obstáculo a menos de 20cm
+    parado();
+    digitalWrite(LED_Derecho, HIGH);      // parpadeo de los leds para indicar presencia de obstáculo
+    digitalWrite(LED_Izquierdo, HIGH);
+    delay(500);
+    digitalWrite(LED_Derecho, LOW);
+    digitalWrite(LED_Izquierdo, LOW);
+    delay(500);
+  }
+                                  
   int SL_IZQUIERDO_VAL = analogRead(SL_IZQUIERDO);
   int SL_DERECHO_VAL = analogRead(SL_DERECHO);
 
+  if(!digitalRead(BOTON)){                       // antes de calibrar poner en pista negra !
+    calibrar_negro();
+  }
+  
   if(SL_IZQUIERDO_VAL > UMBRAL && SL_DERECHO_VAL > UMBRAL){
     digitalWrite(LED_Derecho, HIGH);
     digitalWrite(LED_Izquierdo, HIGH);
     adelante();
 
-    SL_IZQUIERDO_VALOR_ANTERIOR = SL_IZQUIERDO_VAL;
-    SL_DERECHO_VALOR_ANTERIOR = SL_DERECHO_VAL;
   }else if(SL_IZQUIERDO_VAL > UMBRAL && SL_DERECHO_VAL < UMBRAL){
     digitalWrite(LED_Izquierdo, HIGH); 
     digitalWrite(LED_Derecho, LOW);
     giro_izquierda();
 
-    SL_IZQUIERDO_VALOR_ANTERIOR = SL_IZQUIERDO_VAL;
-    SL_DERECHO_VALOR_ANTERIOR = SL_DERECHO_VAL;
   }else if(SL_IZQUIERDO_VAL < UMBRAL && SL_DERECHO_VAL > UMBRAL){
     digitalWrite(LED_Derecho, HIGH);
     digitalWrite(LED_Izquierdo, LOW);
     giro_derecha();
 
-    SL_IZQUIERDO_VALOR_ANTERIOR = SL_IZQUIERDO_VAL;
-    SL_DERECHO_VALOR_ANTERIOR = SL_DERECHO_VAL;
   }else if(SL_IZQUIERDO_VALOR_ANTERIOR > UMBRAL && SL_DERECHO_VALOR_ANTERIOR < UMBRAL){
     digitalWrite(LED_Izquierdo, HIGH); 
     digitalWrite(LED_Derecho, LOW);
     giro_izquierda();    
+    
   }else if(SL_DERECHO_VALOR_ANTERIOR > UMBRAL && SL_IZQUIERDO_VALOR_ANTERIOR < UMBRAL){
     digitalWrite(LED_Derecho, HIGH);
     digitalWrite(LED_Izquierdo, LOW);
     giro_derecha();
-  }
-  else{
+  
+  }else{
     digitalWrite(LED_Derecho, LOW);
     digitalWrite(LED_Izquierdo, LOW);
     parado();
   }
 
+    SL_IZQUIERDO_VALOR_ANTERIOR = SL_IZQUIERDO_VAL;
+    SL_DERECHO_VALOR_ANTERIOR = SL_DERECHO_VAL;
+
 /*
-  mySerial.print("Sens_izq:");
+   mySerial.print("Sens_izq:");
 
    mySerial.print(analogRead(SL_IZQUIERDO));
 
@@ -103,8 +135,7 @@ void loop() {
 void calibrar_negro(){
   int SL_IZQUIERDO_VAL = analogRead(SL_IZQUIERDO);
   int SL_DERECHO_VAL = analogRead(SL_DERECHO);
-
-  UMBRAL = (SL_IZQUIERDO_VAL + SL_DERECHO_VAL) / 2 - 100;
+  UMBRAL = (SL_IZQUIERDO_VAL + SL_DERECHO_VAL) / 2 - 100;     // UMBRAL = valor para el NEGRO
   mySerial.println(UMBRAL);
 }
 
@@ -125,10 +156,10 @@ void reversa(){
 
 void giro_derecha(){
     analogWrite(MOTOR_IZQUIERDO, MAXIMA_VELOCIDAD_DIRECTA);
-    analogWrite(MOTOR_DERECHO, MOTOR_PARADO);
+    analogWrite(MOTOR_DERECHO, VELOCIDAD_INTERMEDIA_DIRECTA);
 }
 
 void giro_izquierda(){
-    analogWrite(MOTOR_IZQUIERDO, MOTOR_PARADO);
+    analogWrite(MOTOR_IZQUIERDO, VELOCIDAD_INTERMEDIA_DIRECTA);
     analogWrite(MOTOR_DERECHO, MAXIMA_VELOCIDAD_DIRECTA);
 }
