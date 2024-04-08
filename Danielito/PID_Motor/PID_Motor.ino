@@ -21,7 +21,7 @@ double kp = 1;
 double ki = 1;
 double kd = 0.01;
 
-double SetP[2] = {210.0, 210.0}; // Set Point para los dos motores
+double SetP[2] = {150.0, 150.0}; // Set Point para los dos motores
 
 double error[2] = {0}; // Arreglo para almacenar los errores de los dos motores
 double errorAnt[2] = {0}; // Arreglo para almacenar los errores anteriores de los dos motores
@@ -40,6 +40,7 @@ void setup() {
   pinMode(pinENCODER[0], OUTPUT);
   pinMode(pinENCODER[1], OUTPUT);  
   digitalWrite(ENCODER_ENABLE, HIGH);
+  digitalWrite(MOTOR_ENABLE, HIGH);
 
   tiempoAnterior = 0;
 }

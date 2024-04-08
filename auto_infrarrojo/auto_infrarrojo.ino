@@ -3,8 +3,8 @@
 SoftwareSerial mySerial(PB10, PB11); 
 
 // Velocidades en PWM
-#define MAXIMA_VELOCIDAD_DIRECTA 0
-#define VELOCIDAD_INTERMEDIA_DIRECTA 1747
+#define MAXIMA_VELOCIDAD_DIRECTA 500
+#define VELOCIDAD_INTERMEDIA_DIRECTA 1900
 #define MOTOR_PARADO 2047
 #define MAXIMA_VELOCIDAD_INVERSA 4095
 #define VELOCIDAD_INTERMEDIA_INVERSA 3047
@@ -86,7 +86,6 @@ void loop() {
     digitalWrite(LED_Izquierdo, LOW);
     parado();
   }
-
 /*
   mySerial.print("Sens_izq:");
 
