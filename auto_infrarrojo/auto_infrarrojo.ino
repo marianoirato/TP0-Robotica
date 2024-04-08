@@ -1,3 +1,17 @@
+/*
+this code was developed to the 10-84 eduromaa
+
+
+*************************************************WARNING*******************************************************
+STARTUP: Colocar robot sobre el centro de la linea negra y presionar el boton central PB14 por algunos segundos
+luego colocar el robot sobre un tramo recto y dejarlo libre. 
+***************************************************************************************************************
+*/
+
+
+
+
+
 #include "definicion_pines.hpp"
 #include <SoftwareSerial.h>
 SoftwareSerial mySerial(PB10, PB11); 
