@@ -1,6 +1,13 @@
 /*
 this code was developed to the 10-84 eduromaa
 
+Grupo 7
+
+Irato       80001
+Gonzalez    72853
+Juarez      79111
+Cotos       
+
 
 *************************************************WARNING*******************************************************
 STARTUP: Colocar robot sobre el centro de la linea negra y presionar el boton central PB14 por algunos segundos
