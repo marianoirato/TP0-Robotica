@@ -12,6 +12,8 @@ SoftwareSerial mySerial(PB10, PB11);
 float UMBRAL = 500; // Mayor a este umbral es NEGRO
 int SL_IZQUIERDO_VALOR_ANTERIOR = 0;
 int SL_DERECHO_VALOR_ANTERIOR = 0;
+long tiempo; // timepo que demora en llegar el eco
+long distancia; // distancia en centimetros
 
 void calibrar_negro();
 void adelante();
@@ -41,6 +43,12 @@ void setup() {
 
     pinMode(BOTON, INPUT);
     
+    pinMode(SONAR_TRIGGER, OUTPUT);          // pin como salida
+    pinMode(SONAR_ECHO, INPUT);              // pin como entrada
+    pinMode(SONAR_ENABLE, OUTPUT);
+    digitalWrite(SONAR_TRIGGER, LOW);        // Inicializamos el pin con 0
+    digitalWrite(SONAR_ENABLE, HIGH);
+    
 }
 
 void loop() {
@@ -50,6 +58,24 @@ void loop() {
   
   int SL_IZQUIERDO_VAL = analogRead(SL_IZQUIERDO);
   int SL_DERECHO_VAL = analogRead(SL_DERECHO);
+
+
+  sonar();
+
+  
+
+  if(distancia < 50){
+    parado();
+    do{
+      
+       sonar();
+      
+      }
+     
+      while(distancia < 50);
+
+    
+  }
 
   if(SL_IZQUIERDO_VAL > UMBRAL && SL_DERECHO_VAL > UMBRAL){
     digitalWrite(LED_Derecho, HIGH);
@@ -86,6 +112,9 @@ void loop() {
     digitalWrite(LED_Izquierdo, LOW);
     parado();
   }
+
+  mySerial.print("Sens_izq:");
+  mySerial.println(distancia);
 /*
   mySerial.print("Sens_izq:");
 
@@ -130,4 +159,16 @@ void giro_derecha(){
 void giro_izquierda(){
     analogWrite(MOTOR_IZQUIERDO, MOTOR_PARADO);
     analogWrite(MOTOR_DERECHO, MAXIMA_VELOCIDAD_DIRECTA);
+}
+
+
+void sonar(){
+
+  
+  digitalWrite(SONAR_TRIGGER, HIGH);
+  delayMicroseconds(10);               // Enviamos un pulso de 10us
+  digitalWrite(SONAR_TRIGGER, LOW);
+  
+  tiempo = pulseIn(SONAR_ECHO, HIGH);        //  obtenemos el ancho del pulso
+  distancia = tiempo/59;  
 }
